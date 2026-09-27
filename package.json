@@ -1,0 +1,30 @@
+{
+  "name": "playwright-two-bars",
+  "version": "0.1.0",
+  "description": "Run one Playwright test against a control and a candidate. Report passes, regressions, and inconclusive comparisons.",
+  "license": "MIT",
+  "repository": { "type": "git", "url": "git+https://github.com/zxy1256/playwright-two-bars.git" },
+  "homepage": "https://github.com/zxy1256/playwright-two-bars#readme",
+  "bugs": { "url": "https://github.com/zxy1256/playwright-two-bars/issues" },
+  "type": "commonjs",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+    "./reporter": { "types": "./dist/reporter.d.ts", "default": "./dist/reporter.js" }
+  },
+  "files": ["dist", "README.md", "LICENSE", "CONTRIBUTING.md"],
+  "engines": { "node": ">=20" },
+  "keywords": ["playwright", "testing", "reporter", "regression", "control"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.check.json",
+    "test": "npm run build && node --test tests/*.test.cjs",
+    "demo": "npm run build && playwright test -c examples/demo/playwright.config.ts",
+    "demo:serve": "node examples/demo/server.mjs",
+    "verify:demo": "npm run build && node scripts/verify-demo.cjs",
+    "prepack": "npm run build"
+  },
+  "peerDependencies": { "@playwright/test": ">=1.49.0 <2" },
+  "devDependencies": { "@playwright/test": "^1.58.0", "@types/node": "^22.0.0", "typescript": "^5.9.0" }
+}
