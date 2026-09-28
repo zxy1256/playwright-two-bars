@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { pairId } from 'playwright-two-bars';
+import { pairId } from 'playwright-two-lines';
 
 test('legacy shipping calculator', { annotation: pairId('shipping-total') }, () => {
   const legacy = (subtotal: number) => subtotal >= 50 ? 0 : 5;

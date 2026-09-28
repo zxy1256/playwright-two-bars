@@ -1,11 +1,11 @@
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const { twoBarsProjects, pairId, METADATA_KEY } = require('../dist');
+const { twoLinesProjects, pairId, METADATA_KEY } = require('../dist');
 const { renderHtml } = require('../dist/html');
 
 test('project overrides retain shared fixtures and metadata without mutating inputs', () => {
   const shared = { use: { locale: 'en-US', baseURL: 'http://shared' }, metadata: { owner: 'team' } };
-  const projects = twoBarsProjects({ name: 'chrome', shared, control: { use: { baseURL: 'http://control' } }, candidate: {} });
+  const projects = twoLinesProjects({ name: 'chrome', shared, control: { use: { baseURL: 'http://control' } }, candidate: {} });
   assert.equal(projects[0].use.locale, 'en-US');
   assert.equal(projects[0].use.baseURL, 'http://control');
   assert.equal(projects[1].use.baseURL, 'http://shared');
@@ -14,8 +14,8 @@ test('project overrides retain shared fixtures and metadata without mutating inp
   assert.deepEqual(projects[1].metadata[METADATA_KEY], { version: 1, pair: 'chrome', role: 'candidate' });
 });
 test('invalid project names and pair IDs are rejected', () => {
-  assert.throws(() => twoBarsProjects({ name: ' ', control: {}, candidate: {} }));
-  assert.throws(() => twoBarsProjects({ control: { name: 'same' }, candidate: { name: 'same' } }));
+  assert.throws(() => twoLinesProjects({ name: ' ', control: {}, candidate: {} }));
+  assert.throws(() => twoLinesProjects({ control: { name: 'same' }, candidate: { name: 'same' } }));
   assert.throws(() => pairId(''));
 });
 test('report HTML escapes arbitrary error text', () => {

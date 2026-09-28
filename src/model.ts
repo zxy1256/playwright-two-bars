@@ -1,6 +1,6 @@
-export type BarStatus = 'passed' | 'failed' | 'flaky' | 'skipped' | 'interrupted' | 'missing';
-export interface Bar {
-  status: BarStatus;
+export type LineStatus = 'passed' | 'failed' | 'flaky' | 'skipped' | 'interrupted' | 'missing';
+export interface Line {
+  status: LineStatus;
   project?: string;
   durationMs: number;
   attempts: { status: string; retry: number; durationMs: number; errors: string[] }[];
@@ -11,19 +11,19 @@ export interface Comparison {
   title: string;
   file: string;
   repeat: number;
-  control: Bar;
-  candidate: Bar;
+  control: Line;
+  candidate: Line;
   verdict: 'passed' | 'regression' | 'inconclusive';
   reason: string;
 }
 export interface ReporterOptions {
-  /** Relative to Playwright's rootDir; defaults to two-bars-report. */
+  /** Relative to Playwright's rootDir; defaults to two-lines-report. */
   outputDir?: string;
   /** Inconclusive comparisons are neutral by default; opt in to a CI gate. */
   failOnInconclusive?: boolean;
   quiet?: boolean;
 }
-export interface TwoBarsReport {
+export interface TwoLinesReport {
   schemaVersion: 1;
   generatedAt: string;
   durationMs: number;
@@ -34,7 +34,7 @@ export interface TwoBarsReport {
   comparisons: Comparison[];
 }
 
-export function verdict(control: Bar, candidate: Bar): Pick<Comparison, 'verdict' | 'reason'> {
+export function verdict(control: Line, candidate: Line): Pick<Comparison, 'verdict' | 'reason'> {
   if (control.status !== 'passed') {
     return { verdict: 'inconclusive', reason: `Control is ${control.status}; the comparison is not valid.` };
   }

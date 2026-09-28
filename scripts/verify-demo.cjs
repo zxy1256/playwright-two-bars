@@ -14,7 +14,7 @@ const { chromium } = require('@playwright/test');
   process.stderr.write(result.stderr);
   assert.ifError(result.error);
   assert.equal(result.status, 1, 'The demo contains a deliberate regression');
-  const reportDir = path.join(root, 'two-bars-report');
+  const reportDir = path.join(root, 'two-lines-report');
   const report = JSON.parse(readFileSync(path.join(reportDir, 'report.json'), 'utf8'));
   assert.deepEqual(report.summary, { passed: 1, regression: 1, inconclusive: 1 });
   const browser = await chromium.launch({ channel: process.env.DEMO_BROWSER_CHANNEL });

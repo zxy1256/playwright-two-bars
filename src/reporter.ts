@@ -2,18 +2,18 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { FullConfig, FullResult, Reporter, Suite, TestCase, TestError } from '@playwright/test/reporter';
 import { METADATA_KEY, PAIR_ID_ANNOTATION, type PairMetadata } from './index';
-import { verdict, type Bar, type Comparison, type ReporterOptions, type TwoBarsReport } from './model';
+import { verdict, type Line, type Comparison, type ReporterOptions, type TwoLinesReport } from './model';
 import { renderHtml } from './html';
 
-const missing = (): Bar => ({ status: 'missing', durationMs: 0, attempts: [] });
+const missing = (): Line => ({ status: 'missing', durationMs: 0, attempts: [] });
 
-function bar(test: TestCase): Bar {
+function line(test: TestCase): Line {
   const attempts = test.results.map(result => ({
     status: result.status, retry: result.retry, durationMs: result.duration,
     errors: result.errors.map(error => error.message ?? error.value ?? 'Unknown error'),
   }));
   const last = attempts.at(-1);
-  let status: Bar['status'] = 'missing';
+  let status: Line['status'] = 'missing';
   if (last) {
     if (last.status === 'passed') status = attempts.some(a => a.status !== 'passed') ? 'flaky' : 'passed';
     else if (last.status === 'skipped') status = 'skipped';
@@ -23,7 +23,7 @@ function bar(test: TestCase): Bar {
   return { status, project: test.parent.project()?.name, durationMs: attempts.reduce((sum, a) => sum + a.durationMs, 0), attempts };
 }
 
-class TwoBarsReporter implements Reporter {
+class TwoLinesReporter implements Reporter {
   private config!: FullConfig;
   private suite!: Suite;
   private errors: string[] = [];
@@ -47,12 +47,12 @@ class TwoBarsReporter implements Reporter {
         this.errors.push(`Unexpected pass in ${test.title}: remove test.fail() before using this as a positive paired check.`);
       }
       if (raw.version !== 1 || typeof raw.pair !== 'string' || !raw.pair.trim() || !['control', 'candidate'].includes(raw.role)) {
-        this.errors.push(`Invalid Two Bars metadata on project ${test.parent.project()?.name}.`);
+        this.errors.push(`Invalid Two Lines metadata on project ${test.parent.project()?.name}.`);
         continue;
       }
       const ids = test.annotations.filter(a => a.type === PAIR_ID_ANNOTATION);
       if (ids.length > 1 || (ids.length === 1 && !ids[0].description?.trim())) {
-        this.errors.push(`Test ${test.title} must have at most one nonempty two-bars:id annotation.`);
+        this.errors.push(`Test ${test.title} must have at most one nonempty two-lines:id annotation.`);
         continue;
       }
       const file = path.relative(this.config.rootDir, test.location.file).split(path.sep).join('/');
@@ -68,7 +68,7 @@ class TwoBarsReporter implements Reporter {
       }
       if (group[raw.role].project !== undefined) {
         this.errors.push(`Duplicate ${raw.role} for ${group.title} in comparison ${raw.pair}. Use unique pair IDs or comparison names.`);
-      } else group[raw.role] = bar(test);
+      } else group[raw.role] = line(test);
     }
     const comparisons = [...groups.values()].sort((a, b) => a.id.localeCompare(b.id));
     const summary = { passed: 0, regression: 0, inconclusive: 0 };
@@ -83,18 +83,18 @@ class TwoBarsReporter implements Reporter {
         (this.options.failOnInconclusive && summary.inconclusive) ||
         (this.config.failOnFlakyTests && this.suite.allTests().some(t => t.outcome() === 'flaky')) ? 'failed' : 'passed';
     } else if (this.errors.length && status === 'passed') status = 'failed';
-    const report: TwoBarsReport = {
+    const report: TwoLinesReport = {
       schemaVersion: 1, generatedAt: new Date().toISOString(), durationMs: result.duration,
       runStatus: result.status, exitStatus: status, summary, errors: this.errors, comparisons,
     };
-    const output = path.resolve(this.config?.rootDir ?? process.cwd(), this.options.outputDir ?? 'two-bars-report');
+    const output = path.resolve(this.config?.rootDir ?? process.cwd(), this.options.outputDir ?? 'two-lines-report');
     await mkdir(output, { recursive: true });
     await Promise.all([
       writeFile(path.join(output, 'report.json'), JSON.stringify(report, null, 2) + '\n'),
       writeFile(path.join(output, 'index.html'), renderHtml(report)),
     ]);
     if (!this.options.quiet) {
-      console.log('\n  Playwright Two Bars · C = control · T = candidate\n');
+      console.log('\n  Playwright Two Lines · C = control · T = candidate\n');
       for (const c of comparisons) console.log(`  C ${symbol(c.control)}  T ${symbol(c.candidate)}  ${c.verdict.toUpperCase().padEnd(12)} ${c.pair} › ${c.title}${c.repeat ? ` (repeat ${c.repeat + 1})` : ''}\n      ${c.reason}`);
       console.log(`\n  ${summary.passed} passed · ${summary.regression} regressions · ${summary.inconclusive} inconclusive`);
       for (const error of this.errors) console.error(`  Runner error: ${error}`);
@@ -104,6 +104,6 @@ class TwoBarsReporter implements Reporter {
   }
 }
 
-function symbol(value: Bar): string { return value.status === 'passed' ? '┃' : value.status === 'failed' ? '╳' : '?'; }
+function symbol(value: Line): string { return value.status === 'passed' ? '┃' : value.status === 'failed' ? '╳' : '?'; }
 
-export = TwoBarsReporter;
+export = TwoLinesReporter;

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { pairId } from 'playwright-two-bars';
+import { pairId } from 'playwright-two-lines';
 
 if (process.env.SCENARIO === 'load-error') throw new Error('deliberate module load failure');
 

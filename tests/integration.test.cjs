@@ -8,7 +8,7 @@ const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const cli = require.resolve('@playwright/test/cli');
 function run(scenario, { strict = false, args = [] } = {}) {
-  const directory = mkdtempSync(path.join(tmpdir(), 'two-bars-test-'));
+  const directory = mkdtempSync(path.join(tmpdir(), 'two-lines-test-'));
   const result = spawnSync(process.execPath, [cli, 'test', '-c', 'tests/fixtures/playwright.config.ts', ...args], {
     cwd: root,
     env: { ...process.env, SCENARIO: scenario, REPORT_DIR: directory, STRICT: strict ? '1' : '0', FORCE_COLOR: '0' },

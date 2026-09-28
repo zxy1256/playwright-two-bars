@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-// These exact tests run in both projects. No Two Bars test wrapper required.
+// These exact tests run in both projects. No Two Lines test wrapper required.
 test.beforeEach(async ({ page }) => { await page.goto('./'); });
 
 test('shoppers can add a book to their cart', async ({ page }) => {

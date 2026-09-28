@@ -1,8 +1,8 @@
-# Playwright Two Bars
+# Playwright Two Lines
 
 **One test. Two targets. A result you can put in context.**
 
-Playwright Two Bars runs your Playwright tests against a **control** and a
+Playwright Two Lines runs your Playwright tests against a **control** and a
 **candidate**, then reports their results together. A failing control invalidates
 the comparison, so an existing failure does not get labeled a new regression.
 
@@ -13,8 +13,8 @@ Delivery estimate     ┃    ╳    REGRESSION
 Reader rewards        ╳    ╳    INCONCLUSIVE
 ```
 
-The two bars are inspired by a test kit's control and test indicators. Here a
-green bar means that target passed; a red bar means it failed. C is the control,
+The two lines are inspired by a test kit's control and test indicators. Here a
+green line means that target passed; a red line means it failed. C is the control,
 T is the candidate under test. Text labels accompany every color.
 
 ## Try the demo
@@ -27,9 +27,9 @@ npx playwright install chromium
 npm run demo
 ```
 
-Open `two-bars-report/index.html`. The self-contained report works from disk and
+Open `two-lines-report/index.html`. The self-contained report works from disk and
 includes filtering, both target results, retry attempts, and failure messages.
-Machine-readable results are in `two-bars-report/report.json`.
+Machine-readable results are in `two-lines-report/report.json`.
 
 If Chrome is already installed, `DEMO_BROWSER_CHANNEL=chrome npm run demo` uses it
 instead of the downloaded Chromium. The same variable works with `verify:demo`.
@@ -52,19 +52,19 @@ This repository is the initial source release; it has not been published to npm.
 Build an installable archive with `npm pack`, then in your application:
 
 ```sh
-npm install -D @playwright/test /absolute/path/to/playwright-two-bars-0.1.0.tgz
+npm install -D @playwright/test /absolute/path/to/playwright-two-lines-0.1.0.tgz
 ```
 
 Configure the two targets in `playwright.config.ts`:
 
 ```ts
 import { defineConfig } from '@playwright/test';
-import { twoBarsProjects } from 'playwright-two-bars';
+import { twoLinesProjects } from 'playwright-two-lines';
 
 export default defineConfig({
   testDir: './tests',
-  reporter: [['playwright-two-bars/reporter']],
-  projects: twoBarsProjects({
+  reporter: [['playwright-two-lines/reporter']],
+  projects: twoLinesProjects({
     control: { use: { baseURL: 'https://staging.example.com' } },
     candidate: { use: { baseURL: 'http://localhost:3000' } },
   }),
@@ -105,9 +105,9 @@ timeouts, and interrupted runs remain failures/nonzero exits. Playwright's
 evidence cannot establish a regression. To require conclusive results in CI:
 
 ```ts
-reporter: [['playwright-two-bars/reporter', {
+reporter: [['playwright-two-lines/reporter', {
   failOnInconclusive: true,
-  outputDir: 'two-bars-report', // relative to Playwright's rootDir (usually testDir)
+  outputDir: 'two-lines-report', // relative to Playwright's rootDir (usually testDir)
 }]],
 ```
 
@@ -129,7 +129,7 @@ options go in `shared`; target options override them. `use` and `metadata` are
 shallow-merged; other project fields are replaced.
 
 ```ts
-projects: twoBarsProjects({
+projects: twoLinesProjects({
   name: 'checkout-chromium',
   shared: { use: { browserName: 'chromium', locale: 'en-US' }, retries: 1 },
   control: {
@@ -142,12 +142,12 @@ projects: twoBarsProjects({
 ```
 
 Custom fixture options can be typed with
-`twoBarsProjects<MyTestOptions, MyWorkerOptions>(...)`.
+`twoLinesProjects<MyTestOptions, MyWorkerOptions>(...)`.
 
-For multiple browsers or comparisons, spread multiple `twoBarsProjects(...)`
+For multiple browsers or comparisons, spread multiple `twoLinesProjects(...)`
 arrays into `projects`, giving each a unique `name`. The generated project names
 are `<name>:control` and `<name>:candidate`. Explicit project names are supported.
-The helper reserves the `playwright-two-bars` project metadata key.
+The helper reserves the `playwright-two-lines` project metadata key.
 
 ### Different test implementations
 
@@ -155,7 +155,7 @@ Sometimes the control is a legacy API or reference implementation. Use different
 `testMatch` settings and attach the same explicit ID to equivalent tests:
 
 ```ts
-import { pairId } from 'playwright-two-bars';
+import { pairId } from 'playwright-two-lines';
 
 // legacy.spec.ts — selected by the control project
 test('legacy lookup', { annotation: pairId('customer-lookup') }, async () => {
@@ -187,12 +187,12 @@ original test, while `repeatEach` runs are separate comparisons.
   `quiet` (default `false`, suppresses terminal output only).
 - The JSON report has `schemaVersion: 1`, summary counts, comparison reasons,
   per-side attempts/errors, and original `runStatus` versus resulting `exitStatus`.
-- Two Bars uses Playwright's documented reporter `onEnd` status override. Other
+- Two Lines uses Playwright's documented reporter `onEnd` status override. Other
   reporters still show the native individual test outcomes; they do not acquire a
-  new native Playwright “inconclusive” status. Keep Two Bars as the only reporter
+  new native Playwright “inconclusive” status. Keep Two Lines as the only reporter
   that overrides exit status.
 - Add Playwright's HTML reporter for native traces, screenshots, attachments, and
-  step details. The Two Bars report includes text failures and retries, not an
+  step details. The Two Lines report includes text failures and retries, not an
   embedded trace viewer. Reports can contain application data from error messages.
 - Both projects run independently. Do not make the candidate depend on the control:
   Playwright may skip dependent projects when a control fails. Share setup projects

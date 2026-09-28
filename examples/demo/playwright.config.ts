@@ -1,14 +1,14 @@
 import { defineConfig } from '@playwright/test';
-import { twoBarsProjects } from 'playwright-two-bars';
+import { twoLinesProjects } from 'playwright-two-lines';
 
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
   workers: 2,
   retries: 0,
-  reporter: [[require.resolve('playwright-two-bars/reporter'), { outputDir: '../../../two-bars-report' }]],
+  reporter: [[require.resolve('playwright-two-lines/reporter'), { outputDir: '../../../two-lines-report' }]],
   use: { browserName: 'chromium', headless: true, channel: process.env.DEMO_BROWSER_CHANNEL },
-  projects: twoBarsProjects({
+  projects: twoLinesProjects({
     name: 'bookshop',
     control: { use: { baseURL: 'http://127.0.0.1:4173/control/' } },
     candidate: { use: { baseURL: 'http://127.0.0.1:4173/candidate/' } },
